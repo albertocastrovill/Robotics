@@ -1,15 +1,30 @@
 # Import standard libraries
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--num_links', type=int,default=2, help=" Number of Links of the Robotic Arm")
+parser.add_argument('--iters', type=int,default=100, help=" Iterations")
+parser.add_argument('--mean_a', type=float, nargs='+',default=0.0, help="Mean A")
+parser.add_argument('--std_a', type=float,default=0.1, help="Standard Deviation A")
+parser.add_argument('--mean_theta', type=int, nargs='+',default=0, help="Mean Theta")
+parser.add_argument('--std_theta', type=float,default=0.1, help="Standard Deviation Theta")
+
+args = parser.parse_args()
 
 # Define uncertainties associated to joints and links
-mean_a1, std_a1 = 40, 0.1
-mean_theta1, std_theta1 = 45, 0.25
-mean_a2, std_a2 = 40, 0.1
-mean_theta2, std_theta2 = 45, 0.25
+
+mean_a1, std_a1 = args.mean_a[0], args.std_a
+mean_theta1, std_theta1 = args.mean_theta[0], args.std_theta
+mean_a2, std_a2 = args.mean_a[1], args.std_a
+mean_theta2, std_theta2 = args.mean_theta[1], args.std_theta
+mean_a3, std_a3 = args.mean_a[2], args.std_a
+mean_theta3, std_theta3 = args.mean_theta[2], args.std_theta
  
 # Define two arrays to hold the joints positions
-NITERS = 100
+NITERS = args.iters
 J1_G_samples = np.zeros((2, NITERS))
 J2_G_samples = np.zeros((2, NITERS))
 J3_G_samples = np.zeros((2, NITERS))
@@ -79,6 +94,7 @@ plt.scatter(mean_J3[0], mean_J3[1], s=10, color='g')
 plt.plot([mean_J1[0], mean_J2[0]], [mean_J1[1], mean_J2[1]], 'b', linewidth=2)
 plt.plot([mean_J2[0], mean_J3[0]], [mean_J2[1], mean_J3[1]], 'b', linewidth=2)
 plt.axis('equal')
+
 plt.xlim([-0.5, 1.5])
 plt.ylim([-0.5, 2])
 plt.show()

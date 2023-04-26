@@ -19,7 +19,7 @@ print(f'joint1: {link1}')
 print(f'joint1: {link2}')
 print(f'joint1: {dummy}')
 
-client.setStepping(True)
+#client.setStepping(True)
 sim.startSimulation()
 
 #Rotate joint 1
