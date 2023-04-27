@@ -23,8 +23,8 @@ mean_theta2, std_theta2 = args.theta[1], args.s_theta
 mean_a3, std_a3 = args.a[2], args.s_a
 mean_theta3, std_theta3 = args.theta[2], args.s_theta
  
-# Define two arrays to hold the joints positions
-NITERS = args.iters
+# Define three arrays to hold the joints positions
+NITERS = 100
 J1_G_samples = np.zeros((2, NITERS))
 J2_G_samples = np.zeros((2, NITERS))
 J3_G_samples = np.zeros((2, NITERS))
@@ -65,38 +65,40 @@ for i in range(NITERS):
 				  [ np.sin(theta3),  np.cos(theta3), a3*np.sin(theta3)],
 				  [ 0             ,  0             , 1               ]])
 	J3 = np.array([[0], [0], [1]])
-	J3_G = np.dot(T2, np.dot(T3, J3))
+	J3_G = np.dot(T1, np.dot(T2, np.dot(T3, J3)))
 	J3_G_samples[:,i] = J3_G[0:2,0]
+    
 
-
-# Compute mean of each error data points
 mean_J1 = np.mean(J1_G_samples, axis=1)
 mean_J2 = np.mean(J2_G_samples, axis=1)
 mean_J3 = np.mean(J3_G_samples, axis=1)
-
 print(mean_J1)
 print(mean_J2)
 print(mean_J3)
 
-# Visualise the error propagation
-plt.figure(1, figsize=(6,6))
+print('----'*13)
+
+print(J1_G_samples[0,:],J1_G_samples[1,:])
+print('----'*13)
+print(J2_G_samples[0,:],J2_G_samples[1,:])
+print('----'*13)
+print(J3_G_samples[0,:],J3_G_samples[1,:])
+
+plt.figure(1, figsize=(10,10))
 plt.scatter(0, 0, s=20)
 
 plt.scatter(J1_G_samples[0,:], J1_G_samples[1,:], s=5)
-plt.plot([0, mean_J1[0]], [0, mean_J1[1]], 'b', linewidth=2)
+plt.plot([0, mean_J1[0]], [0, mean_J1[1]], 'r', linewidth=2)
 
 plt.scatter(J2_G_samples[0,:], J2_G_samples[1,:], s=5)
-plt.scatter(mean_J2[0], mean_J2[1], s=20, color='r', linewidth=2)
+plt.scatter(mean_J2[0], mean_J2[1], s=10, color='r')
 
 plt.scatter(J3_G_samples[0,:], J3_G_samples[1,:], s=5)
 plt.scatter(mean_J3[0], mean_J3[1], s=10, color='g')
 
-plt.plot([mean_J1[0], mean_J2[0]], [mean_J1[1], mean_J2[1]], 'b', linewidth=2)
-plt.plot([mean_J2[0], mean_J3[0]], [mean_J2[1], mean_J3[1]], 'b', linewidth=2)
+plt.plot([mean_J1[0], mean_J2[0]], [mean_J1[1], mean_J2[1]], 'r', linewidth=2)
+plt.plot([mean_J2[0], mean_J3[0]], [mean_J2[1], mean_J3[1]], 'r', linewidth=2)
 plt.axis('equal')
-
-plt.xlim([-2, 5])
-plt.ylim([-2, 5])
+plt.xlim([-40, 150])
+plt.ylim([-40, 150])
 plt.show()
-
-#if __name__ == "__main__":

@@ -26,34 +26,38 @@ def variable_init():
     NITERS = args.iters
     J_G_samples = np.zeros((2 * args.num_links, NITERS))
 
-def calculate_joints_position(a, theta):
-    # Compute the position of Joint 1
-    joints_positions = np.zeros((3, args.num_links))
+
+def calculate_joint_positions(num_links, mean_a, std_a, mean_theta, std_theta):
+    # initialize arrays for joint positions
+    joint_positions = np.zeros((2, num_links))
+
+    # initialize transformation matrix and joint vector
+    T = np.eye(3)
     J = np.array([[0], [0], [1]])
-    #J = np.array([[0, 0,1]])
-    for i in range(args.num_links):
-        T_i = np.array([[np.cos(theta[i]), -np.sin(theta[i]), a[i]*np.cos(theta[i])], 
-                        [np.sin(theta[i]), np.cos(theta[i]), a[i]*np.sin(theta[i])],
+
+    for i in range(num_links):
+        # Sample a and theta from a Gaussian PDF
+        a = np.random.normal(loc=mean_a[i], scale=std_a[i])
+        theta = np.deg2rad(np.random.normal(loc=mean_theta[i], scale=std_theta[i]))
+
+        # Compute the position of the current joint
+        T_i = np.array([[np.cos(theta), -np.sin(theta), a*np.cos(theta)], 
+                        [np.sin(theta), np.cos(theta), a*np.sin(theta)],
                         [0, 0, 1]])
-        print(T_i)
-        #joints_positions[:, i] = np.dot(T_i, J)
-        joints_positions[:, i] = np.dot(T_i, J)
-    J_G = joints_positions[:2, :].reshape(-1, order='F')
-    
-    return J_G
+        T = np.dot(T, T_i)
+        J_G = np.dot(T, J)
+        joint_positions[:,i] = J_G[0:2,0]
+
+    return joint_positions
 
 
 if __name__ == "__main__":
     variable_init()
     # Main loop
     for i in range(NITERS):
-        # Sample a and theta values from a Gaussian PDF
-        a = np.random.normal(loc=mean_a, scale=std_a, size=args.num_links)
-        theta = np.deg2rad(np.random.normal(loc=mean_theta, scale=std_theta, size=args.num_links))
-
+        
         # Compute the position of each joint
-        J_G = calculate_joints_position(a, theta)
-        J_G_samples[:, i] = J_G[0:2,0]
+        joint_positions = calculate_joint_positions(3, mean_a, std_a, mean_theta, std_theta)
         
 
     # Compute mean of each error data points
